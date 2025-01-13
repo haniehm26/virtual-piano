@@ -2,6 +2,8 @@
 
 A Python-based virtual piano that uses computer vision to detect hand gestures and trigger MIDI notes. This project leverages OpenCV, MediaPipe, and the `rtmidi` library for real-time hand detection and MIDI output.
 
+This project was developed as the final project for the Computer Vision course at Sapienza University.
+
 ---
 
 ## **Features**
@@ -42,3 +44,10 @@ A Python-based virtual piano that uses computer vision to detect hand gestures a
 - **rtmidi**: For MIDI communication.
 - **psutil**: To monitor CPU usage.
 - **NumPy**: For efficient numerical operations.
+
+---
+## **Team Members**
+
+- [Ehsan Mokhtari](https://github.com/sherlannn)
+- [Hanieh Mahdavi](https://github.com/haniehm26)
+- [Arash Bakhshaee Babaroud](https://github.com/ArashB1230)

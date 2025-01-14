@@ -80,7 +80,7 @@ try:
         fps = calculate_fps(frame_count, start_time)
         cpu_usage, last_cpu_check_time = monitor_cpu_usage(last_cpu_check_time, interval=0.5)
         smoothed_cpu = smooth_cpu_usage(cpu_usage, cpu_history, max_history=10)
-        cv.putText(frame, f"fps: {fps:.2f}, cpu_usage: {smoothed_cpu:.2f}", (30, 30), cv.FONT_HERSHEY_SIMPLEX, 1.1, RED, 3, cv.LINE_AA)
+        cv.putText(frame, f"fps: {fps:.2f}, cpu_usage: {smoothed_cpu:.2f}%", (30, 30), cv.FONT_HERSHEY_SIMPLEX, 1.1, RED, 3, cv.LINE_AA)
 
         cv.imshow(WINDOW_NAME, frame)
 

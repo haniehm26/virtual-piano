@@ -47,7 +47,6 @@ This project was developed as the final project for the Computer Vision course a
 
 ---
 ## **Team Members**
-
-- [Ehsan Mokhtari](https://github.com/sherlannn)
 - [Hanieh Mahdavi](https://github.com/haniehm26)
+- [Ehsan Mokhtari](https://github.com/sherlannn)
 - [Arash Bakhshaee Babaroud](https://github.com/ArashB1230)

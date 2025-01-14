@@ -35,46 +35,27 @@ video = cv.VideoCapture(0)
 frame_width = int(video.get(cv.CAP_PROP_FRAME_WIDTH))
 frame_height = int(video.get(cv.CAP_PROP_FRAME_HEIGHT))
 
-scaled_width = frame_width
-scaled_height = frame_height
+kernel_size = 2 * int(KERNEL_SIZE * frame_width / 2) + 1
 
-display_width = frame_width
-display_height = frame_height
-
-kernel_size = 2 * int(KERNEL_SIZE * scaled_width / 2) + 1
-
-cv.namedWindow(WINDOW_NAME, cv.WINDOW_AUTOSIZE)
-cv.resizeWindow(WINDOW_NAME, display_width, display_height)
-
-display_rects, scaled_rects, frame_rects = [], [], []
-
+display_rects = []
 for i in range(NUM_KEYS):
-    x0 = scaled_width * i // NUM_KEYS
-    x1 = scaled_width * (i + 1) // NUM_KEYS - 1
-    r = [(x0, 0), (x1, int(KEY_HEIGHT * scaled_height))]
-    scaled_rects.append(r)
-
     x0 = frame_width * i // NUM_KEYS
     x1 = frame_width * (i + 1) // NUM_KEYS - 1
     r = [(x0, 0), (x1, int(KEY_HEIGHT * frame_height))]
-    frame_rects.append(r)
-
-    x0 = display_width * i // NUM_KEYS
-    x1 = display_width * (i + 1) // NUM_KEYS - 1
-    r = [(x0, 0), (x1, int(KEY_HEIGHT * display_height))]
     display_rects.append(r)
 
-keys_top_left_scaled = (min(r[0][0] for r in scaled_rects), min(r[0][1] for r in scaled_rects))
-keys_bottom_right_scaled = (max(r[1][0] for r in scaled_rects), max(r[1][1] for r in scaled_rects))
+keys_top_left_scaled = (min(r[0][0] for r in display_rects), min(r[0][1] for r in display_rects))
+keys_bottom_right_scaled = (max(r[1][0] for r in display_rects), max(r[1][1] for r in display_rects))
+
 keys_width_scaled = keys_bottom_right_scaled[0] - keys_top_left_scaled[0]
 keys_heigh_scaled = keys_bottom_right_scaled[1] - keys_top_left_scaled[1]
 
 keys = np.zeros((keys_heigh_scaled, keys_width_scaled), dtype=np.uint8)
 
-for i in range(NUM_KEYS):
-    r = scaled_rects[i]
-    cv.rectangle(keys, (r[0][0] - keys_top_left_scaled[0], r[0][1] - keys_top_left_scaled[1]),
-                  (r[1][0] - keys_top_left_scaled[0], r[1][1] - keys_top_left_scaled[1]), i + 1, cv.FILLED)
+for i, r in enumerate(display_rects):
+    x0, y0 = r[0]
+    x1, y1 = r[1]
+    keys[y0:y1, x0:x1] = i + 1
 
 saved_frame = None
 comparison_frame = None
@@ -84,6 +65,8 @@ last_check_time = 0
 # FPS counter
 start_time = time.time()
 frame_count = 0
+
+# CPU
 last_cpu_check_time = start_time
 cpu_history = deque()
 
@@ -97,8 +80,6 @@ try:
             frame = cv.flip(frame, 1)
 
         keys_frame = frame[keys_top_left_scaled[1]:keys_bottom_right_scaled[1], keys_top_left_scaled[0]:keys_bottom_right_scaled[0]]
-        if scaled_width != frame_width:
-            keys_frame = cv.resize(keys_frame, (keys_width_scaled, keys_heigh_scaled))
         keys_frame = cv.cvtColor(keys_frame, cv.COLOR_BGR2GRAY)
 
         blurred = cv.GaussianBlur(keys_frame, (kernel_size, kernel_size), 0)
@@ -163,10 +144,8 @@ try:
         fps = calculate_fps(frame_count, start_time)
         cpu_usage, last_cpu_check_time = monitor_cpu_usage(last_cpu_check_time, interval=0.5)
         smoothed_cpu = smooth_cpu_usage(cpu_usage, cpu_history, max_history=10)
-        cv.putText(frame, f"fps: {fps:.2f}, cpu_usage: {smoothed_cpu:.2f}%", (10, display_height - 10), cv.FONT_HERSHEY_SIMPLEX, 1.1, RED, 3, cv.LINE_AA)
-
-        display = cv.resize(frame, (display_width, display_height)) if frame_width != display_width else frame
-        cv.imshow(WINDOW_NAME, cv.addWeighted(display, 1, frame, 0.25, 1.0))
+        cv.putText(frame, f"fps: {fps:.2f}, cpu_usage: {smoothed_cpu:.2f}%", (10, frame_height - 10), cv.FONT_HERSHEY_SIMPLEX, 1.1, RED, 3, cv.LINE_AA)
+        cv.imshow(WINDOW_NAME, cv.addWeighted(frame, 1, frame, 0.25, 1.0))
         
         if cv.waitKey(1) & 0xFF == 27:
             break

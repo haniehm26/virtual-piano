@@ -1,3 +1,10 @@
 venv
 __pycache__
 *.pdf
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+credentials*.json
